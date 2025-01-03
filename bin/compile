@@ -9,7 +9,7 @@ mkdir -p "$INSTALL_DIR/bin"
 # Download and install New Relic CLI
 curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
 
-# Move the binary to the local bin directory
+# Move the binary to the local bin directory (remove sudo)
 mv /usr/local/bin/newrelic "$INSTALL_DIR/bin/"
 
 # Set New Relic Credentials as environment variables (from Heroku config vars)
@@ -31,15 +31,12 @@ export PATH="$INSTALL_DIR/bin:$PATH"
 NEW_RELIC_AGENT_URL="https://download.newrelic.com/agent/newrelic-linux.tar.gz"
 curl -Ls "$NEW_RELIC_AGENT_URL" -o newrelic-linux.tar.gz
 
-# Extract the agent files
-tar -zxvf newrelic-linux.tar.gz
-
-# Move the agent directory to the app root
-mv newrelic-linux/* .
+# Extract the agent files (modify to extract to desired location)
+tar -xzvf newrelic-linux.tar.gz -C $HOME/app
 
 # Configure the agent with Heroku environment variables
-sed -i "s/license_key.*/license_key: $NEW_RELIC_LICENSE_KEY/" newrelic.yml
-sed -i "s/app_name.*/app_name: $HEROKU_APP_NAME/" newrelic.yml
+sed -i "s/license_key.*/license_key: $NEW_RELIC_LICENSE_KEY/" $HOME/app/newrelic.yml
+sed -i "s/app_name.*/app_name: $HEROKU_APP_NAME/" $HOME/app/newrelic.yml
 
 echo "New Relic agent downloaded and configured"
 
