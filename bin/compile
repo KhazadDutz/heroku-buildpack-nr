@@ -49,7 +49,35 @@ fi
 
 echo "Detected architecture '$arch'"
 
-# DOWNLOAD_URL="https://cli.doppler.com/download?os=$os&arch=$arch&format=tar"
+echo "Install New Relic CLI"
+# Install the New Relic CLI
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+
+echo "Check NEW RELIC ENV"
+# Set New Relic environment variables from Heroku Config Vars
+NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY:-}"
+NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID:-}"
+
+# Check if required config vars are set
+if [ -z "$NEW_RELIC_API_KEY" ]; then
+  echo "Error: NEW_RELIC_API_KEY config var is not set."
+  exit 1 # Exit with an error code
+fi
+
+if [ -z "$NEW_RELIC_ACCOUNT_ID" ]; then
+  echo "Error: NEW_RELIC_ACCOUNT_ID config var is not set."
+  exit 1 # Exit with an error code
+fi
+
+echo "Instal New Relic Apache Integration"
+# Install the New Relic Apache integration
+/usr/local/bin/newrelic install -n apache-open-source-integration
+
+# Check the exit status of the New Relic install command
+if [ $? -ne 0 ]; then
+    echo "Error: New Relic installation failed."
+    exit 1
+fi
 
 # filename="doppler-download.tar.gz"
 
@@ -64,3 +92,5 @@ echo "Detected architecture '$arch'"
 # DOPPLER_TOKEN=$(cat $ENV_DIR/DOPPLER_TOKEN)
 
 # ./doppler secrets download --token $DOPPLER_TOKEN --no-file --format env > .env
+
+# curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && sudo NEW_RELIC_API_KEY=INSERT_YOUR_API_KEY NEW_RELIC_ACCOUNT_ID=INSERT_YOUR_ACCOUNT_ID /usr/local/bin/newrelic install -n apache-open-source-integration
