@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Compile script for Heroku buildpack (New Relic agent)
+
+# Set the install directory (Heroku's /app/.local)
+INSTALL_DIR="$HOME/.local"
+mkdir -p "$INSTALL_DIR/bin"
+
+# Download and install New Relic CLI
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+
+# Move the binary to the local bin directory
+mv /usr/local/bin/newrelic "$INSTALL_DIR/bin/"
+
+# Set New Relic Credentials as environment variables (from Heroku config vars)
+export NEW_RELIC_API_KEY="$NEW_RELIC_API_KEY"
+export NEW_RELIC_ACCOUNT_ID="$NEW_RELIC_ACCOUNT_ID"
+export NEW_RELIC_LICENSE_KEY="$NEW_RELIC_LICENSE_KEY"
+
+# Optionally Install an Integration
+if [[ ! -z "$NEW_RELIC_INTEGRATION" ]]; then
+  "$INSTALL_DIR/bin/newrelic" install -n "$NEW_RELIC_INTEGRATION"
+fi
+
+echo "New Relic CLI installed in $INSTALL_DIR/bin/"
+
+# Add the binary directory to PATH
+export PATH="$INSTALL_DIR/bin:$PATH"
+
+# Download the New Relic agent (Linux version assumed)
+NEW_RELIC_AGENT_URL="https://download.newrelic.com/agent/newrelic-linux.tar.gz"
+curl -Ls "$NEW_RELIC_AGENT_URL" -o newrelic-linux.tar.gz
+
+# Extract the agent files
+tar -zxvf newrelic-linux.tar.gz
+
+# Move the agent directory to the app root
+mv newrelic-linux/* .
+
+# Configure the agent with Heroku environment variables
+sed -i "s/license_key.*/license_key: $NEW_RELIC_LICENSE_KEY/" newrelic.yml
+sed -i "s/app_name.*/app_name: $HEROKU_APP_NAME/" newrelic.yml
+
+echo "New Relic agent downloaded and configured"
+
+# Print out the path for debugging
+echo "PATH: $PATH"
