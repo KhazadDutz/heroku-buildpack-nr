@@ -33,7 +33,7 @@ uname_machine=$(uname -m)
 if [ "$uname_machine" = "i386" ] || [ "$uname_machine" = "i686" ]; then
   arch="i386"
 elif [ "$uname_machine" = "amd64" ] || [ "$uname_machine" = "x86_64" ]; then
-  arch="amd64"
+  arch="x86_64"
 elif [ "$uname_machine" = "armv6" ] || [ "$uname_machine" = "armv6l" ]; then
   arch="armv6"
 elif [ "$uname_machine" = "armv7" ] || [ "$uname_machine" = "armv7l" ]; then
@@ -48,36 +48,11 @@ else
 fi
 
 echo "Detected architecture '$arch'"
-
 echo "Install New Relic CLI"
-# Install the New Relic CLI
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
-
-echo "Check NEW RELIC ENV"
-# Set New Relic environment variables from Heroku Config Vars
-export NEW_RELIC_API_KEY="c83fd98dc1a8dfec4562c8baa1b56200FFFFNRAL"
-export NEW_RELIC_ACCOUNT_ID="6317598"
-
-# Check if required config vars are set
-if [ -z "$NEW_RELIC_API_KEY" ]; then
-  echo "Error: NEW_RELIC_API_KEY config var is not set."
-  exit 1 # Exit with an error code
-fi
-
-if [ -z "$NEW_RELIC_ACCOUNT_ID" ]; then
-  echo "Error: NEW_RELIC_ACCOUNT_ID config var is not set."
-  exit 1 # Exit with an error code
-fi
-
-echo "Instal New Relic Apache Integration"
-# Install the New Relic Apache integration
-/usr/local/bin/newrelic install -n apache-open-source-integration
-
-# Check the exit status of the New Relic install command
-if [ $? -ne 0 ]; then
-    echo "Error: New Relic installation failed."
-    exit 1
-fi
+DOWNLOAD_URL="https://github.com/newrelic/newrelic-cli/releases/download/v0.97.2/newrelic-cli_0.97.2_${os}_${arch}.tar.gz"
+DOWNLOAD_URL2="https://github.com/newrelic/newrelic-cli/releases/download/v0.97.2/newrelic-cli_0.97.2_'$os'_'$arch'.tar.gz"
+echo "DOWNLOAD URL '$DOWNLOAD_URL'"
+echo "DOWNLOAD URL '$DOWNLOAD_URL2'"
 
 # filename="doppler-download.tar.gz"
 
