@@ -1,8 +1,6 @@
 #!/bin/sh
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
-command -v systemctl (used in Systemd)
-
-command -v update-rc.d (used in SysV)
-
-command -v initctl (used in Upstart)
+command -v systemctl
+command -v update-rc.d 
+command -v initctl
