@@ -55,8 +55,8 @@ curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh |
 
 echo "Check NEW RELIC ENV"
 # Set New Relic environment variables from Heroku Config Vars
-NEW_RELIC_API_KEY="${NEW_RELIC_API_KEY:-}"
-NEW_RELIC_ACCOUNT_ID="${NEW_RELIC_ACCOUNT_ID:-}"
+export NEW_RELIC_API_KEY="c83fd98dc1a8dfec4562c8baa1b56200FFFFNRAL"
+export NEW_RELIC_ACCOUNT_ID="6317598"
 
 # Check if required config vars are set
 if [ -z "$NEW_RELIC_API_KEY" ]; then
