@@ -1,44 +1,66 @@
-#!/bin/bash
+#!/bin/sh
+# bin/compile <build-dir> <cache-dir> <env-dir>
 
-# Compile script for Heroku buildpack (New Relic agent)
+# Parse args
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
 
-# Set the install directory (Heroku's /app/.local)
-INSTALL_DIR="$HOME/.local"
-mkdir -p "$INSTALL_DIR/bin"
-
-# Download and install New Relic CLI
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
-
-# Move the binary to the local bin directory (remove sudo)
-mv /usr/local/bin/newrelic "$INSTALL_DIR/bin/"
-
-# Set New Relic Credentials as environment variables (from Heroku config vars)
-export NEW_RELIC_API_KEY="$NEW_RELIC_API_KEY"
-export NEW_RELIC_ACCOUNT_ID="$NEW_RELIC_ACCOUNT_ID"
-export NEW_RELIC_LICENSE_KEY="$NEW_RELIC_LICENSE_KEY"
-
-# Optionally Install an Integration
-if [[ ! -z "$NEW_RELIC_INTEGRATION" ]]; then
-  "$INSTALL_DIR/bin/newrelic" install -n "$NEW_RELIC_INTEGRATION"
+# identify OS
+os="unknown"
+uname_os=$(uname -s)
+if [ "$uname_os" = "Darwin" ]; then
+  os="macos"
+elif [ "$uname_os" = "Linux" ]; then
+  os="linux"
+elif [ "$uname_os" = "FreeBSD" ]; then
+  os="freebsd"
+elif [ "$uname_os" = "OpenBSD" ]; then
+  os="openbsd"
+elif [ "$uname_os" = "NetBSD" ]; then
+  os="netbsd"
+else
+  echo "ERROR: Unsupported OS '$uname_os'"
+  echo ""
+  clean_exit 1
 fi
 
-echo "New Relic CLI installed in $INSTALL_DIR/bin/"
+log_debug "Detected OS '$os'"
 
-# Add the binary directory to PATH
-export PATH="$INSTALL_DIR/bin:$PATH"
+# identify arch
+arch="unknown"
+uname_machine=$(uname -m)
+if [ "$uname_machine" = "i386" ] || [ "$uname_machine" = "i686" ]; then
+  arch="i386"
+elif [ "$uname_machine" = "amd64" ] || [ "$uname_machine" = "x86_64" ]; then
+  arch="amd64"
+elif [ "$uname_machine" = "armv6" ] || [ "$uname_machine" = "armv6l" ]; then
+  arch="armv6"
+elif [ "$uname_machine" = "armv7" ] || [ "$uname_machine" = "armv7l" ]; then
+  arch="armv7"
+# armv8?
+elif [ "$uname_machine" = "arm64" ]; then
+  arch="arm64"
+else
+  echo "ERROR: Unsupported architecture '$uname_machine'"
+  echo ""
+  clean_exit 1
+fi
 
-# Download the New Relic agent (Linux version assumed)
-NEW_RELIC_AGENT_URL="https://download.newrelic.com/agent/newrelic-linux.tar.gz"
-curl -Ls "$NEW_RELIC_AGENT_URL" -o newrelic-linux.tar.gz
+log_debug "Detected architecture '$arch'"
 
-# Extract the agent files (modify to extract to desired location)
-tar -xzvf newrelic-linux.tar.gz -C $HOME/app
+# DOWNLOAD_URL="https://cli.doppler.com/download?os=$os&arch=$arch&format=tar"
 
-# Configure the agent with Heroku environment variables
-sed -i "s/license_key.*/license_key: $NEW_RELIC_LICENSE_KEY/" $HOME/app/newrelic.yml
-sed -i "s/app_name.*/app_name: $HEROKU_APP_NAME/" $HOME/app/newrelic.yml
+# filename="doppler-download.tar.gz"
 
-echo "New Relic agent downloaded and configured"
+# curl --silent --retry 3 -o "$filename" -LN -D - "$DOWNLOAD_URL"
 
-# Print out the path for debugging
-echo "PATH: $PATH"
+# tar -zxvf $filename -C $BUILD_DIR
+
+# chmod +x $BUILD_DIR/doppler
+
+# cd "$BUILD_DIR" || exit
+
+# DOPPLER_TOKEN=$(cat $ENV_DIR/DOPPLER_TOKEN)
+
+# ./doppler secrets download --token $DOPPLER_TOKEN --no-file --format env > .env
