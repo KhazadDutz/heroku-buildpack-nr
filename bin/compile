@@ -25,7 +25,7 @@ else
   clean_exit 1
 fi
 
-log_debug "Detected OS '$os'"
+echo "Detected OS '$os'"
 
 # identify arch
 arch="unknown"
@@ -47,7 +47,7 @@ else
   clean_exit 1
 fi
 
-log_debug "Detected architecture '$arch'"
+echo "Detected architecture '$arch'"
 
 # DOWNLOAD_URL="https://cli.doppler.com/download?os=$os&arch=$arch&format=tar"
 
