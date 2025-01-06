@@ -16,6 +16,7 @@ cd "newrelic-infra" || exit
 # Access the license key from the Heroku config var
 # NEW_RELIC_LICENSE_KEY="${NEW_RELIC_LICENSE_KEY:-}"
 NEW_RELIC_APP_NAME="${NEW_RELIC_APP_NAME:-}"
+echo "$NEW_RELIC_APP_NAME"
 
 # Check if the license key is set
 # if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
