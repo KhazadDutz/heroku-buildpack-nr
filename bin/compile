@@ -13,9 +13,6 @@ curl --silent --retry 3 -o "$filename" -LN -D - "$DOWNLOAD_URL"
 
 tar -zxvf $filename -C $BUILD_DIR
 
-cho "----------folder-------"
-ls
-
 chmod +x newrelic-infra
 
 # Access the license key from the Heroku config var
