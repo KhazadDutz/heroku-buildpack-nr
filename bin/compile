@@ -17,14 +17,29 @@ chmod +x newrelic-infra
 
 # Access the license key from the Heroku config var
 NEW_RELIC_LICENSE_KEY=$(cat $ENV_DIR/NEW_RELIC_LICENSE_KEY)
-echo "New Relic License Key: \"$NEW_RELIC_LICENSE_KEY\""
 
-cd "newrelic-infra" || exit
-
-echo "After----------------------"
-echo "New Relic License Key: \"$NEW_RELIC_LICENSE_KEY\""
 # Check if the license key is set
 if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
   echo "Error: NEW_RELIC_LICENSE_KEY config var is not set."
   exit 1
 fi
+
+
+# Modify the config_defaults.sh file
+if grep -q "NRIA_LICENSE_KEY=" newrelic-infra/config_defaults.sh; then
+  # Line exists, so perform the substitution
+  sed -i "s/NRIA_LICENSE_KEY=.*/NRIA_LICENSE_KEY=\"$NEW_RELIC_LICENSE_KEY\"/" newrelic-infra/config_defaults.sh
+  echo "NRIA_LICENSE_KEY already set in config_defaults.sh"
+else
+  # Line doesn't exist, so append it
+  echo "NRIA_LICENSE_KEY=\"$NEW_RELIC_LICENSE_KEY\"" >> newrelic-infra/config_defaults.sh
+  # Check after appending (less secure)
+  if grep -q "NRIA_LICENSE_KEY=\"$NEW_RELIC_LICENSE_KEY\"" newrelic-infra/config_defaults.sh; then
+    echo "NRIA_LICENSE_KEY successfully appended"
+  else
+    echo "Error: NRIA_LICENSE_KEY not found after appending!"
+  fi
+fi
+
+# Execute the installer (if necessary, otherwise adjust config files directly)
+# ./newrelic-infra/installer.sh
