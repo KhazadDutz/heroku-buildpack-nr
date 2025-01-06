@@ -17,10 +17,12 @@ chmod +x newrelic-infra
 
 # Access the license key from the Heroku config var
 NEW_RELIC_LICENSE_KEY=$(cat $ENV_DIR/NEW_RELIC_LICENSE_KEY)
-# echo "New Relic License Key: \"$NEW_RELIC_LICENSE_KEY\""
+echo "New Relic License Key: \"$NEW_RELIC_LICENSE_KEY\""
 
 cd "newrelic-infra" || exit
 
+echo "After----------------------"
+echo "New Relic License Key: \"$NEW_RELIC_LICENSE_KEY\""
 # Check if the license key is set
 if [ -z "$NEW_RELIC_LICENSE_KEY" ]; then
   echo "Error: NEW_RELIC_LICENSE_KEY config var is not set."
