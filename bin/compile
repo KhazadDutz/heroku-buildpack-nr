@@ -11,7 +11,7 @@ tar -zxvf $filename -C $BUILD_DIR
 
 chmod +x newrelic-infra
 
-cd "newrelic-infra" || exit
+# cd "newrelic-infra" || exit
 
 # Access the license key from the Heroku config var
 # NEW_RELIC_LICENSE_KEY="${NEW_RELIC_LICENSE_KEY:-}"
