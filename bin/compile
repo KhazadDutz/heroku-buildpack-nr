@@ -42,4 +42,4 @@ else
 fi
 
 # Execute the installer (if necessary, otherwise adjust config files directly)
-# ./newrelic-infra/installer.sh
+./newrelic-infra/installer.sh
