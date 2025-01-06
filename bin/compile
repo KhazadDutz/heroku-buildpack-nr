@@ -1,6 +1,18 @@
 #!/bin/sh
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
-command -v systemctl
-command -v update-rc.d 
-command -v initctl
+DOWNLOAD_URL="https://download.newrelic.com/infrastructure_agent/binaries/linux/amd64/newrelic-infra_linux_1.59.0_amd64.tar.gz"
+filename="newrelic-infra-binary.tar.gz"
+BUILD_DIR="./"
+
+curl --silent --retry 3 -o "$filename" -LN -D - "$DOWNLOAD_URL"
+
+tar -zxvf $filename -C $BUILD_DIR
+
+chmod +x newrelic-infra
+
+cd "newrelic-infra" || exit
+
+NEW_RELIC_LICENSE_KEY="${NEW_RELIC_LICENSE_KEY:-}"
+
+echo NEW_RELIC_LICENSE_KEY
